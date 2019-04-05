@@ -1,19 +1,18 @@
 #include "decode.h"
 
-uint8_t getFormat(){
+uint8_t Decode::getFormat(){
 	return (opcode & 0xE0) >> 5;
 }
 
-uint8_t getID(){
+uint8_t Decode::getID(){
 	return (opcode & 0x1F);
 }
 
-
-event* create_event_for_fetch(){
+event* Decode::create_event_for_fetch(){
 
 	message *m = new message;
-	m->source = "DECODE";
-	m->dest = "FETCH";
+	strcpy(m->source,DECODE);
+	strcpy(m->dest,FETCH);
 	m->magic_struct = NULL;
 	m->next = NULL;
 
@@ -26,11 +25,11 @@ event* create_event_for_fetch(){
 }
 
 
-event* create_event_for_ALU(){
+event* Decode::create_event_for_ALU(){
 
 	message *m = new message;
-	m->source = "DECODE";
-	m->dest = "ALU";
+	strcpy(m->source,DECODE);
+	strcpy(m->dest,ALU);
 	m->magic_struct = NULL;
 	m->next = NULL;
 
@@ -43,11 +42,11 @@ event* create_event_for_ALU(){
 }
 
 
-event* create_event_for_cache(bool type,uint16_t address,uint16_t data=0){
+event* Decode::create_event_for_memory(bool type,uint16_t address,uint16_t data=0){
 	
 	message *m = new message;
-	m->source = "DECODE";
-	m->dest = "MEM_SUB";
+	strcpy(m->source,DECODE);
+	strcpy(m->dest,MEMORY);
 
 	shared_dec_mem.type = type;
 	shared_dec_mem.address = address;
@@ -65,23 +64,30 @@ event* create_event_for_cache(bool type,uint16_t address,uint16_t data=0){
 }
 
 
-event* receiver_msg(message *msg){
-	if(strcmp(msg->source,"MEM_SUB")== 0){
-		return handle_cache(*msg);
+event* Decode::notify(message *msg){
+
+	if(strcmp(msg->dest,DECODE) != 0){
+		return NULL;
 	}
 
-	else if(strcmp(msg->source,"FETCH")== 0){
-		return handle_fetch(*msg);
+	if(strcmp(msg->source,MEMORY)== 0){
+		return handle_memory(msg);
 	}
 
-	else if(strcmp(msg->source,"ALU")== 0){
-		return handle_alu(*msg);
+	if(strcmp(msg->source,FETCH)== 0){
+		return handle_fetch(msg);
 	}
+
+	if(strcmp(msg->source,ALU)== 0){
+		return handle_alu(msg);
+	} 
+
+	return NULL; 				//cannot reach here
 }
 
 
-event* handle_cache(message *msg){
-	if(msg->magic_struct == null){	//ack
+event* Decode::handle_memory(message *msg){
+	if(msg->magic_struct == NULL){	//ack
 		return create_event_for_fetch();	//???	
 	}
 	else{
@@ -91,7 +97,7 @@ event* handle_cache(message *msg){
 }
 
 
-event* handle_load(uint16_t data){
+event* Decode::handle_load(uint16_t data){
 
 	REGS[dest_reg] = data;
 	return create_event_for_fetch();
@@ -99,7 +105,7 @@ event* handle_load(uint16_t data){
 }
 
 
-event* handle_alu(message *msg){
+event* Decode::handle_alu(message *msg){
 /*
 	queste cose non servono più perchè non abbiamo indirizzamenti indiretti nell'instruction set.
 
@@ -116,7 +122,7 @@ event* handle_alu(message *msg){
 }
 
 
-event* handle_fetch(message *msg){
+event* Decode::handle_fetch(message *msg){
 
 	uint8_t format = getFormat();
 
@@ -186,7 +192,7 @@ function execute_tipo_modulo_memoria(){
 
 //FORMATI
 
-event* format_0(){
+event* Decode::format_0(){
 	uint8_t id = getID();
 	switch(id){
 		case 0:		//HLT
@@ -202,16 +208,16 @@ event* format_0(){
 }
 
 
-event* format_1(){
+event* Decode::format_1(){
 	uint8_t id = getID();
 	switch(id){
-		case 0, 10:		//JE, JZ
+		case 0: case 10:		//JE, JZ
 			if(extract_flag(ZF))
 			{
 				ip = source_reg;
 			}			
 			break;
-		case 1, 11:		//JNE, JNZ
+		case 1: case 11:		//JNE, JNZ
 			if(!extract_flag(ZF))
 			{
 				ip = source_reg;
@@ -223,13 +229,13 @@ event* format_1(){
 				ip = source_reg;
 			}
 			break;
-		case 3, 13:		//JAE, JNC
+		case 3: case 13:		//JAE, JNC
 			if(!extract_flag(CF))
 			{
 				ip = source_reg;
 			}
 			break;
-		case 4, 12:		//JB, JC
+		case 4: case 12:		//JB, JC
 			if(extract_flag(CF))
 			{
 				ip = source_reg;
@@ -298,17 +304,17 @@ event* format_1(){
 }
 
 
-event* format_2(){
+event* Decode::format_2(){
 	uint8_t id = getID();
 
 	switch(id){
-		case 0, 10:		//JE, JZ
+		case 0: case 10:		//JE, JZ
 			if(extract_flag(ZF))
 			{
 				ip = REGS[source_reg];
 			}			
 			break;
-		case 1, 11:		//JNE, JNZ
+		case 1: case 11:		//JNE, JNZ
 			if(!extract_flag(ZF))
 			{
 				ip = REGS[source_reg];
@@ -320,13 +326,13 @@ event* format_2(){
 				ip = REGS[source_reg];
 			}
 			break;
-		case 3, 13:		//JAE, JNC
+		case 3: case 13:		//JAE, JNC
 			if(!extract_flag(CF))
 			{
 				ip = REGS[source_reg];
 			}
 			break;
-		case 4, 12:		//JB, JC
+		case 4: case 12:		//JB, JC
 			if(extract_flag(CF))
 			{
 				ip = REGS[source_reg];
@@ -402,7 +408,7 @@ event* format_2(){
 }
 
 
-event* format_3(){
+event* Decode::format_3(){
 	uint8_t id = getID();
 
 	switch(id){
@@ -417,10 +423,10 @@ event* format_3(){
 			return create_event_for_ALU();
 			break;
 		case 14: 							//LOAD immediato, registro
-			return create_event_for_cache(0, source_reg);
+			return create_event_for_memory(0, source_reg);
 			break;
 		case 15:							//STORE immediato, registro  (in source trovo il dato, in dest trovo l'indirizzo)
-			return create_event_for_cache(1,REGS[dest_reg],source_reg);		//Normalmente sarebbe dovuto essere il contrario, ma in fase di fetching l'indirizzo di 												//memoria in cui memorizzare il dato viene passato nel registro source e non nel registro 													//dest; per questo motivo abbiamo i registri invertiti nell'inviare il messaggio
+			return create_event_for_memory(1,REGS[dest_reg],source_reg);		//Normalmente sarebbe dovuto essere il contrario, ma in fase di fetching l'indirizzo di 												//memoria in cui memorizzare il dato viene passato nel registro source e non nel registro 													//dest; per questo motivo abbiamo i registri invertiti nell'inviare il messaggio
 			break;
 		default:
 			cerr<<"Unknown Instruction Format 3"<<endl;
@@ -429,7 +435,7 @@ event* format_3(){
 }
 
 
-event* format_4(){
+event* Decode::format_4(){
 	uint8_t id = getID();
 
 	switch(id){
@@ -444,17 +450,19 @@ event* format_4(){
 			return create_event_for_ALU();
 			break;
 		case 14: 							//LOAD registro, registro
-			return create_event_for_cache(0, REGS[source_reg]);
+			return create_event_for_memory(0, REGS[source_reg]);
 			break;
 		case 15:							//STORE registro, registro (in source trovo il dato, in dest trovo l'indirizzo)
-			return create_event_for_cache(1, REGS[dest_reg],REGS[source_reg]);
+			return create_event_for_memory(1, REGS[dest_reg],REGS[source_reg]);
 			break;
 		case 16: 							//XCHG resgistro registro
+		{
 			uint16_t tmp = REGS[source_reg];
 			REGS[source_reg] = REGS[dest_reg];
 			REGS[dest_reg] = tmp;
 			return create_event_for_fetch();
 			break;
+		}
 		default:
 			cerr<<"Unknown Instruction Format 4"<<endl;
 			exit(-1);
@@ -462,8 +470,7 @@ event* format_4(){
 }
 
 
-uint8_t extract_flag(uint8_t index){
-	flag >> index;
-	return flag & 1;
+bool Decode::extract_flag(uint8_t index){
+	return (flag >> index) &1;
 
 }
