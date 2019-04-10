@@ -86,7 +86,7 @@ message* Decode::handle_memory(message *msg){
 
 message* Decode::handle_load(uint16_t data){
 
-	REGS[regs.dest] = data;
+	global_regs.general_regs[regs.dest] = data;
 	return create_message_for_fetch();
 
 }
@@ -298,89 +298,89 @@ message* Decode::format_2(){
 		case 0: case 10:		//JE, JZ
 			if(extract_flag(ZF))
 			{
-				regs.ip = REGS[regs.source];
+				regs.ip = global_regs.general_regs[regs.source];
 			}			
 			break;
 		case 1: case 11:		//JNE, JNZ
 			if(!extract_flag(ZF))
 			{
-				regs.ip = REGS[regs.source];
+				regs.ip = global_regs.general_regs[regs.source];
 			}	
 			break;
 		case 2:			//JA
 			if(!extract_flag(CF) && !extract_flag(ZF))
 			{
-				regs.ip = REGS[regs.source];
+				regs.ip = global_regs.general_regs[regs.source];
 			}
 			break;
 		case 3: case 13:		//JAE, JNC
 			if(!extract_flag(CF))
 			{
-				regs.ip = REGS[regs.source];
+				regs.ip = global_regs.general_regs[regs.source];
 			}
 			break;
 		case 4: case 12:		//JB, JC
 			if(extract_flag(CF))
 			{
-				regs.ip = REGS[regs.source];
+				regs.ip = global_regs.general_regs[regs.source];
 			}
 			break;
 		case 5:			//JBE
 			if(extract_flag(CF) || extract_flag(ZF))
 			{
-				regs.ip = REGS[regs.source];
+				regs.ip = global_regs.general_regs[regs.source];
 			}
 			break;
 		case 6:			//JG
 			if(!extract_flag(ZF) && (extract_flag(SF) == extract_flag(OF)))
 			{
-				regs.ip = REGS[regs.source];
+				regs.ip = global_regs.general_regs[regs.source];
 			}
 			break;
 		case 7:			//JGE
 			if(extract_flag(SF) == extract_flag(OF))
 			{
-				regs.ip = REGS[regs.source];
+				regs.ip = global_regs.general_regs[regs.source];
 			}
 			break;
 		case 8:			//JL
 			if(extract_flag(SF) != extract_flag(OF))
 			{
-				regs.ip = REGS[regs.source];
+				regs.ip = global_regs.general_regs[regs.source];
 			}
 			break;
 		case 9:			//JLE
 			if(extract_flag(ZF) || (extract_flag(SF) != extract_flag(OF)))
 			{
-				regs.ip = REGS[regs.source];
+				regs.ip = global_regs.general_regs[regs.source];
 			}
 			break;
 		case 14:		//JO
 			if(extract_flag(OF))
 			{
-				regs.ip = REGS[regs.source];
+				regs.ip = global_regs.general_regs[regs.source];
 			}
 			break;
 		case 15:		//JNO
 			if(!extract_flag(OF))
 			{
-				regs.ip = REGS[regs.source];
+				regs.ip = global_regs.general_regs[regs.source];
 			}
 			break;
 		case 16:		//JS
 			if(extract_flag(SF))
 			{
-				regs.ip = REGS[regs.source];
+				regs.ip = global_regs.general_regs[regs.source];
 			}
 			break;
 		case 17:		//JNS
 			if(!extract_flag(SF))
 			{
-				regs.ip = REGS[regs.source];
+				regs.ip = global_regs.general_regs[regs.source];
 			}
 			break;
 		case 18 ... 21 :						//INC, DEC, NEG, NOT
-			alu_regs.operand1 = REGS[regs.source];		    //registro per la ALU dove troverà il primo operando
+			alu_regs.operand1 = global_regs.general_regs[regs.source];		    //registro per la ALU dove troverà il primo operando
 			alu_regs.operand2 = 0;					    //controllare se serve
 			alu_regs.destination_reg = regs.source;
 			alu_regs.opcode = regs.opcode;
@@ -401,12 +401,12 @@ message* Decode::format_3(){
 
 	switch(id){
 		case 0:								//MOV immediato, registro
-			REGS[regs.dest] = regs.source;
+			global_regs.general_regs[regs.dest] = regs.source;
 			return create_message_for_fetch();
 			break;
 		case 1 ... 13 :		// OP immediato, registro			
 			alu_regs.operand1 = regs.source;		   
-			alu_regs.operand2 = REGS[regs.dest];
+			alu_regs.operand2 = global_regs.general_regs[regs.dest];
 			alu_regs.destination_reg = regs.dest;
 			alu_regs.opcode = regs.opcode;
 			return create_message_for_ALU();
@@ -415,7 +415,7 @@ message* Decode::format_3(){
 			return create_message_for_memory(0, regs.source);
 			break;
 		case 15:							//STORE immediato, registro  (in source trovo il dato, in dest trovo l'indirizzo)
-			return create_message_for_memory(1,REGS[regs.dest],regs.source);		//Normalmente sarebbe dovuto essere il contrario, ma in fase di fetching l'indirizzo di 												//memoria in cui memorizzare il dato viene passato nel registro source e non nel registro 													//dest; per questo motivo abbiamo i registri invertiti nell'inviare il messaggio
+			return create_message_for_memory(1,global_regs.general_regs[regs.dest],regs.source);		//Normalmente sarebbe dovuto essere il contrario, ma in fase di fetching l'indirizzo di 												//memoria in cui memorizzare il dato viene passato nel registro source e non nel registro 													//dest; per questo motivo abbiamo i registri invertiti nell'inviare il messaggio
 			break;
 		default:
 			cerr<<"Unknown Instruction Format 3"<<endl;
@@ -429,27 +429,27 @@ message* Decode::format_4(){
 
 	switch(id){
 		case 0:								//MOV registro, registro
-			REGS[regs.dest] = REGS[regs.source];
+			global_regs.general_regs[regs.dest] = global_regs.general_regs[regs.source];
 			return create_message_for_fetch();	
 			break;
 		case 1 ... 13 :						// OP registro, registro			
-			alu_regs.operand1 = REGS[regs.source];		   
-			alu_regs.operand2 = REGS[regs.dest];
+			alu_regs.operand1 = global_regs.general_regs[regs.source];		   
+			alu_regs.operand2 = global_regs.general_regs[regs.dest];
 			alu_regs.destination_reg = regs.dest;
 			alu_regs.opcode = regs.opcode;
 			return create_message_for_ALU();
 			break;
 		case 14: 							//LOAD registro, registro
-			return create_message_for_memory(0, REGS[regs.source]);
+			return create_message_for_memory(0, global_regs.general_regs[regs.source]);
 			break;
 		case 15:							//STORE registro, registro (in source trovo il dato, in dest trovo l'indirizzo)
-			return create_message_for_memory(1, REGS[regs.dest],REGS[regs.source]);
+			return create_message_for_memory(1, global_regs.general_regs[regs.dest],global_regs.general_regs[regs.source]);
 			break;
 		case 16: 							//XCHG resgistro registro
 		{
-			uint16_t tmp = REGS[regs.source];
-			REGS[regs.source] = REGS[regs.dest];
-			REGS[regs.dest] = tmp;
+			uint16_t tmp = global_regs.general_regs[regs.source];
+			global_regs.general_regs[regs.source] = global_regs.general_regs[regs.dest];
+			global_regs.general_regs[regs.dest] = tmp;
 			return create_message_for_fetch();
 			break;
 		}
@@ -461,6 +461,6 @@ message* Decode::format_4(){
 
 
 bool Decode::extract_flag(uint8_t index){
-	return (flag >> index) &1;
+	return (global_regs.flag >> index) &1;
 
 }

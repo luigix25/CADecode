@@ -20,10 +20,6 @@
 using namespace std;
 
 
-uint16_t flag;
-
-uint16_t REGS[6];
-
 
 struct decode_to_mem{
 	bool type; // 0 = lettura, 1 = scrittura
