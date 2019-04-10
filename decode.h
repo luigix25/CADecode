@@ -13,7 +13,7 @@
 
 #include "module.h"
 #include "fetch_registers.h"
-#include "decode_register.h"
+#include "decode_registers.h"
 #include <iostream>
 #include <cstring>
 
@@ -21,13 +21,6 @@ using namespace std;
 
 
 uint16_t flag;
-
-/*uint32_t ip;
-uint16_t flag;
-uint16_t source_reg;			//controllare dimensioni
-uint8_t dest_reg;
-uint8_t opcode;
-*/
 
 uint16_t REGS[6];
 
