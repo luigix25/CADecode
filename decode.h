@@ -14,18 +14,13 @@
 #include "module.h"
 #include "fetch_registers.h"
 #include "decode_registers.h"
+#include "memory_message.h"
+
 #include <iostream>
 #include <cstring>
 
 using namespace std;
 
-
-
-struct decode_to_mem{
-	bool type; // 0 = lettura, 1 = scrittura
-	uint16_t address;
-	uint16_t data; //questo campo ha significato solo in caso di scrittura
-};
 
 class Decode : public module{
 	private:
@@ -48,7 +43,7 @@ class Decode : public module{
 		message* handle_memory(message *);
 		message* handle_load(uint16_t);
 
-		decode_to_mem shared_dec_mem;		//nome temporaneo
+		memory_message shared_dec_mem;		//nome temporaneo
 	public:
 		void onNotify(message*);
 

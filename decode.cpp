@@ -78,7 +78,8 @@ message* Decode::handle_memory(message *msg){
 		return create_message_for_fetch();	//???	
 	}
 	else{
-		uint16_t data = *((uint16_t*)msg->magic_struct);
+		memory_message* memory_msg = (memory_message*)msg->magic_struct;
+		uint16_t data = memory_msg->data;
 		return handle_load(data);										// può essere solamente una LOAD		
 	}
 }
