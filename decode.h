@@ -12,23 +12,25 @@
 
 
 #include "module.h"
+#include "fetch_registers.h"
+#include "decode_register.h"
 #include <iostream>
 #include <cstring>
 
 using namespace std;
 
-uint32_t ip;
+
+uint16_t flag;
+
+/*uint32_t ip;
 uint16_t flag;
 uint16_t source_reg;			//controllare dimensioni
 uint8_t dest_reg;
 uint8_t opcode;
+*/
 
 uint16_t REGS[6];
 
-
-uint16_t op1_ALU;
-uint16_t op2_ALU;
-uint8_t dest_ALU;
 
 struct decode_to_mem{
 	bool type; // 0 = lettura, 1 = scrittura
@@ -39,29 +41,27 @@ struct decode_to_mem{
 class Decode : public module{
 	private:
 		bool extract_flag(uint8_t);
-		event* format_0();
-		event* format_1();
-		event* format_2();
-		event* format_3();
-		event* format_4();
+		message* format_0();
+		message* format_1();
+		message* format_2();
+		message* format_3();
+		message* format_4();
 
 		uint8_t getFormat();
 		uint8_t getID();
 
-		event* create_event_for_fetch();
-		event* create_event_for_ALU();
-		event* create_event_for_memory(bool,uint16_t,uint16_t);
+		message* create_message_for_fetch();
+		message* create_message_for_ALU();
+		message* create_message_for_memory(bool,uint16_t,uint16_t);
 
-		event* handle_fetch(message *);
-		event* handle_alu(message *);
-		event* handle_memory(message *);
-		event* handle_load(uint16_t);
+		message* handle_fetch(message *);
+		message* handle_alu(message *);
+		message* handle_memory(message *);
+		message* handle_load(uint16_t);
 
 		decode_to_mem shared_dec_mem;		//nome temporaneo
-
-
 	public:
-		event* notify(message*);
+		void onNotify(message*);
 
 
 };
