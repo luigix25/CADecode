@@ -61,11 +61,11 @@ void Decode::onNotify(message *msg){
 		sendWithDelay(handle_memory(msg),EVENT_TIME);
 	}
 
-	if(strcmp(msg->source,FETCH)== 0){
+	else if(strcmp(msg->source,FETCH)== 0){
 		 sendWithDelay(handle_fetch(msg),EVENT_TIME);
 	}
 
-	if(strcmp(msg->source,ALU)== 0){
+	else if(strcmp(msg->source,ALU)== 0){
 		sendWithDelay(handle_alu(msg),EVENT_TIME);
 	} 
 
