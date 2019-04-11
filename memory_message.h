@@ -1,3 +1,4 @@
+#pragma once
 struct memory_message{
 	bool 		type;						//0 for read 1 for write
 	uint16_t 	address;

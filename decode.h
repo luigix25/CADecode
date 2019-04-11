@@ -1,4 +1,6 @@
 //decode.h
+#pragma once
+
 #define CF 0
 #define ZF 6
 #define SF 7
@@ -45,6 +47,7 @@ class Decode : public module{
 
 		memory_message shared_dec_mem;		//nome temporaneo
 	public:
+		Decode(string, int);
 		void onNotify(message*);
 
 

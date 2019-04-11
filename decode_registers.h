@@ -1,3 +1,4 @@
+#pragma once
 struct decode_registers{
 	uint8_t opcode; 						//opcode
 	uint16_t operand1;						//first operand
@@ -12,3 +13,4 @@ struct global_registers{
 	uint16_t general_regs[6];
 
 } global_regs;
+

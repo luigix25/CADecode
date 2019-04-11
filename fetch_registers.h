@@ -10,6 +10,7 @@ Most significant			Least Significant
 
 
 Fetch module interface registers for decode_execute module */
+#pragma once
 struct fetch_registers{
 	uint16_t ip; //instruction pointer
 	uint32_t mdr; //The 4 bytes retrieved from memory during fetch phase will be stored here
@@ -19,3 +20,4 @@ struct fetch_registers{
 	uint16_t source; //1st operand will be stored here
 	uint8_t dest; //2nd operand will be stored here
 } regs;
+

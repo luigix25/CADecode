@@ -1,14 +1,15 @@
 CFLAGS= -Wall -std=c++14 -g
-LIBFLG = 
-LIBDIP = module.o
-LIBFLS = library.o filemanager.o
+LIBDIP = module.o decode.o
 
-all: decode
+all: test
 
-decode: decode.o decode.h structures.h
-	g++ $(CFLAGS) $(LIBDIP) decode.o -o decode
+test: decode.o decode.h test.o module.o
+	g++ $(CFLAGS) $(LIBDIP) test.o -o test
 
-decode.o: decode.cpp module.o decode.h structures.h
+test.o: test.cpp decode.h 
+	g++ $(CFLAGS) -c test.cpp -o test.o
+
+decode.o: decode.cpp decode.h structures.h fetch_registers.h decode_registers.h memory_message.h
 	g++ $(CFLAGS) -c decode.cpp -o decode.o
 
 module.o: module.cpp module.h structures.h

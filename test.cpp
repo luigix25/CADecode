@@ -1,14 +1,14 @@
 #include "decode.h"
-//#include "structures.h"
-#include <iostream>
 
 using namespace std;
 
 int main(){
-	Decode* d = new Decode("Decode");
-	message * m = new message;
-	event * e = new event;	
-	e->time = 0;
+	string s = "Decode";
+	Decode* dec = new Decode(s,0);
+	message * mex = new message;
+	event  ev;
+	vector<event*> event_list;
+	ev.time = 0;
 
 	cout << "Start test" << endl;
 
@@ -18,16 +18,16 @@ int main(){
 
 	regs.opcode = 00000001;
 
-	strcpy(m->source,FETCH);
-	strcpy(m->dest,DECODE);
-	m->magic_struct = NULL;
-	m->next = NULL;
+	strcpy(mex->source,FETCH);
+	strcpy(mex->dest,DECODE);
+	mex->magic_struct = NULL;
+	mex->next = NULL;
 
-	e->message = m;
+	ev.m = mex;
 
-	e = d->notify(e);
+	event_list = dec->notify(&ev);
 
-	cout << e->message->source << endl;
+	cout << event_list[0]->m->source << endl;
 
 
 
