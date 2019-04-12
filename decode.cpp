@@ -3,15 +3,17 @@
 Decode::Decode(string name, int priority) : module(name,priority){}
 
 uint8_t Decode::getFormat(){
+	
 	return (regs.opcode & 0xE0) >> 5;
 }
 
 uint8_t Decode::getID(){
+	
 	return (regs.opcode & 0x1F);
 }
 
 message* Decode::create_message_for_fetch(){
-
+	
 	message *m = new message;
 	strcpy(m->source,DECODE);
 	strcpy(m->dest,FETCH);
@@ -19,8 +21,6 @@ message* Decode::create_message_for_fetch(){
 	m->next = NULL;
 
 	return m;
-
-
 }
 
 
@@ -64,7 +64,7 @@ void Decode::onNotify(message *msg){
 	}
 
 	else if(strcmp(msg->source,FETCH)== 0){
-		 sendWithDelay(handle_fetch(msg),EVENT_TIME);
+		sendWithDelay(handle_fetch(msg),EVENT_TIME);
 	}
 
 	else if(strcmp(msg->source,ALU)== 0){

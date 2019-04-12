@@ -2,6 +2,10 @@
 
 using namespace std;
 
+fetch_registers regs;
+decode_registers alu_regs;
+global_registers global_regs;
+
 int main(){
 	string s = "Decode";
 	Decode* dec = new Decode(s,0);
@@ -27,7 +31,7 @@ int main(){
 
 	event_list = dec->notify(&ev);
 
-	cout << event_list[0]->m->source << endl;
+	cout << event_list[0]->m->dest << endl;
 
 
 

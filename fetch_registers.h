@@ -19,5 +19,6 @@ struct fetch_registers{
 	uint8_t opcode; //Opcode (byte1) after fetch phase will be stored here
 	uint16_t source; //1st operand will be stored here
 	uint8_t dest; //2nd operand will be stored here
-} regs;
+}; 
+extern fetch_registers regs;
 

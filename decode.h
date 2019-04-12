@@ -44,7 +44,7 @@ class Decode : public module{
 		message* handle_alu(message *);
 		message* handle_memory(message *);
 		message* handle_load(uint16_t);
-
+		
 		memory_message shared_dec_mem;		//nome temporaneo
 	public:
 		Decode(string, int);
