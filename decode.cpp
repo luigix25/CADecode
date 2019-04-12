@@ -91,24 +91,12 @@ message* Decode::handle_load(uint16_t data){
 
 	global_regs.general_regs[regs.dest] = data;
 	return create_message_for_fetch();
-
 }
 
 
 message* Decode::handle_alu(message *msg){
-/*
-	queste cose non servono più perchè non abbiamo indirizzamenti indiretti nell'instruction set.
 
-	if(opcode == op_in_mem){
-		uint16_t dest_for_cache = dest;	//è il registro di destinazione fissato durante la fase di fetch
-		uint16_t data = reg_mem;
-		send_msg_to_cache(type = 1,dest_for_cache,data);	//è per forza scrittura
-	}
-	else{
-		if(!check_flag())
-			handle_error(); */
-		return create_message_for_fetch();
-	//}
+	return create_message_for_fetch();
 }
 
 
@@ -136,49 +124,7 @@ message* Decode::handle_fetch(message *msg){
 			cerr<<"Unknown Format"<<endl;
 			exit(-1);
 	}
-
-	/*if(prima_operazione == nessun_modulo)		//operazioni tregs.ipo mov reg/imm reg,hlt,nop,jump 
-		execute_tregs.ipo_nessun_modulo();	
-	else if (prima_operazione == modulo_memoria)	//TUTTE le operazioni per le quali una lettura in memoria è sempre necessaria oppure operazioni che
-		execute_tregs.ipo_modulo_memoria();				//hanno come destinazione un indirizzo di memoria
-													//ESEMPI: primo gruppo:mov imm/reg mem/(reg) ---- 
-
-															  gruppo due:op.ALU 	reg,MEM 	
-																					MEM,reg
-																					(reg),reg
-																					reg,(reg)
-																					imm,(reg)
-																gruppo tre: mv mem,reg
-																			mv (reg),reg
-
-
-
-
-	else if(prima_operazione == modulo_alu)			//essenzialmente saranno sempre e solo operazioni che terminano subito senza passare dalla memoria
-		execute_tregs.ipo_modulo_alu();					//ESEMPI: sub reg,reg sub imm,reg add immg,reg ecc.
-*/
 }
-
-/*
-function execute_tregs.ipo_modulo_memoria(){
-	if(opcode == gruppo uno){							//sono operazioni di scrittura in memoria
-		//prepara dati per cache						//significa che l'operazione da fare termina subito dopo aver fatto la store con la cache
-		send_msg_to_cache(type = 1,dest_for_cache,data);			//ogni scrittura in memoria che viene fatta da qui è una operazione single step.
-	}												//pertanto i tregs.ipi possibili sono solo i 4 appartenenti al gruppo uno
-
-
-	else if(opcode == gruppo due || gruppo tre){				
-													//sono operazioni di lettura in memoria che possono terminare senza andare dalla alu (gruppo 3)
-													//oppure possono andare alla alu (gruppo 2)
-													//in ogni caso non possono terminare con un solo passaggio
-		//prepara dati per cache distinguendo
-		//indirizzamento indiretto o di memoria
-		send_msg_to_cache(type = 0, dest_for_cache);
-
-
-	}
-}*/
-
 
 //FORMATI
 
