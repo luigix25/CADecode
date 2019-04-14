@@ -50,7 +50,7 @@ int main(){
 	cout << "***** START *****" << endl;
 
 	//F0
-	cout << "Format 0" << endl;
+	cout << "Format 0" << endl; 
 	cout << "\tNOP" << endl;
 	regs.opcode = 0x01;
 	event_list = getEventList(dec,fetch_s, decode_s, NULL);
