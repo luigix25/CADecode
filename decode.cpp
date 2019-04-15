@@ -2,6 +2,7 @@
 
 Decode::Decode(string name, int priority) : module(name,priority){}
 
+
 uint8_t Decode::getFormat(){
 	
 	return (regs.opcode & 0xE0) >> 5;
