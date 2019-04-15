@@ -56,6 +56,7 @@ message* Decode::create_message_for_memory(bool type,uint16_t address,uint16_t d
 void Decode::onNotify(message *msg){
 
 	if(strcmp(msg->dest,DECODE) != 0){
+		delete msg;
 		return;
 	}
 
@@ -64,11 +65,13 @@ void Decode::onNotify(message *msg){
 	}
 
 	else if(strcmp(msg->source,FETCH)== 0){
-		sendWithDelay(handle_fetch(msg),EVENT_TIME);
+		delete msg;
+		sendWithDelay(handle_fetch(),EVENT_TIME);
 	}
 
 	else if(strcmp(msg->source,ALU)== 0){
-		sendWithDelay(handle_alu(msg),EVENT_TIME);
+		delete msg;
+		sendWithDelay(handle_alu(),EVENT_TIME);
 	} 
 
 	return; 				//cannot reach here
@@ -77,10 +80,12 @@ void Decode::onNotify(message *msg){
 
 message* Decode::handle_memory(message *msg){
 	if(msg->magic_struct == NULL){	//ack
+		delete msg;
 		return create_message_for_fetch();	//???	
 	}
 	else{
 		memory_message* memory_msg = (memory_message*)msg->magic_struct;
+		delete msg;
 		uint16_t data = memory_msg->data;
 		return handle_load(data);										// può essere solamente una LOAD		
 	}
@@ -94,16 +99,14 @@ message* Decode::handle_load(uint16_t data){
 }
 
 
-message* Decode::handle_alu(message *msg){
-
+message* Decode::handle_alu(){
 	return create_message_for_fetch();
 }
 
 
-message* Decode::handle_fetch(message *msg){
+message* Decode::handle_fetch(){
 
 	uint8_t format = getFormat();
-
 	switch(format){
 		case 0:
 			return format_0();

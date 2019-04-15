@@ -40,8 +40,8 @@ class Decode : public module{
 		message* create_message_for_ALU();
 		message* create_message_for_memory(bool,uint16_t,uint16_t);
 
-		message* handle_fetch(message *);
-		message* handle_alu(message *);
+		message* handle_fetch();
+		message* handle_alu();
 		message* handle_memory(message *);
 		message* handle_load(uint16_t);
 		

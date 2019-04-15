@@ -55,6 +55,7 @@ int main(){
 	regs.opcode = 0x01;
 	event_list = getEventList(dec,fetch_s, decode_s, NULL);
 	cout << mexFD << mexDecode << event_list[0]->m->dest << endl;
+	delete event_list[0]->m;
 
 	//F1
 	cout << "Format 1" << endl;
@@ -62,7 +63,8 @@ int main(){
 		cout << "\t" << nameJump[i] << endl;
 		regs.opcode = 0x20 + i;
 		event_list = getEventList(dec,fetch_s, decode_s, NULL);
-		cout << mexFD << mexDecode << event_list[0]->m->dest << endl;		
+		cout << mexFD << mexDecode << event_list[0]->m->dest << endl;	
+		delete event_list[0]->m;	
 	}
 
 	//F2
@@ -71,7 +73,8 @@ int main(){
 		cout << "\t" << nameJump[i] << endl;
 		regs.opcode = 0x40 + i;
 		event_list = getEventList(dec,fetch_s, decode_s, NULL);
-		cout << mexFD << mexDecode << event_list[0]->m->dest << endl;		
+		cout << mexFD << mexDecode << event_list[0]->m->dest << endl;
+		delete event_list[0]->m;		
 	}
 
 	for(int i = 0; i<nameF2_length; i++){
@@ -80,10 +83,12 @@ int main(){
 		// Send frome FETCH TO DECODE
 		event_list = getEventList(dec,fetch_s, decode_s, NULL);
 		cout << mexFD << mexDecode << event_list[0]->m->dest << endl;
+		delete event_list[0]->m;
 
 		// DECODE must send message to ALU, then ALU send message to DECODE
 		event_list = getEventList(dec,ALU_s, decode_s, NULL);
 		cout << mexAD << mexDecode << event_list[0]->m->dest << endl;
+		delete event_list[0]->m;
 	}
 
 	//F3
@@ -93,6 +98,7 @@ int main(){
 	regs.opcode = 0x60;		
 	event_list = getEventList(dec,fetch_s, decode_s, NULL);
 	cout << mexFD << mexDecode << event_list[0]->m->dest << endl;
+	delete event_list[0]->m;
 
 
 	for(int i = 0; i<nameF3F4_length; i++){
@@ -101,16 +107,19 @@ int main(){
 		// Send frome FETCH TO DECODE
 		event_list = getEventList(dec,fetch_s, decode_s, NULL);
 		cout << mexFD << mexDecode << event_list[0]->m->dest << endl;
+		delete event_list[0]->m;
 
 		if(i<13){
 			// DECODE must send message to ALU, then ALU send message to DECODE
 			event_list = getEventList(dec,ALU_s, decode_s, NULL);
 			cout << mexAD << mexDecode << event_list[0]->m->dest << endl;
+			delete event_list[0]->m;
 		} else{
 				mem_mex = (memory_message*) event_list[0]->m->magic_struct;
 			// MEM to DECODE
 			event_list = getEventList(dec,mem_s, decode_s, (void*)mem_mex);
 			cout << mexMD << mexDecode << event_list[0]->m->dest << endl;
+			delete event_list[0]->m;
 		}
 	}
 
@@ -121,6 +130,7 @@ int main(){
 	regs.opcode = 0x80;		
 	event_list = getEventList(dec,fetch_s, decode_s, NULL);
 	cout << mexFD << mexDecode << event_list[0]->m->dest << endl;
+	delete event_list[0]->m;
 
 
 	for(int i = 0; i<nameF3F4_length; i++){
@@ -129,16 +139,19 @@ int main(){
 		// Send frome FETCH TO DECODE
 		event_list = getEventList(dec,fetch_s, decode_s, NULL);
 		cout << mexFD << mexDecode << event_list[0]->m->dest << endl;
+		delete event_list[0]->m;
 
 		if(i<13){
 			// DECODE must send message to ALU, then ALU send message to DECODE
 			event_list = getEventList(dec,ALU_s, decode_s, NULL);
 			cout << mexAD << mexDecode << event_list[0]->m->dest << endl;
+			delete event_list[0]->m;
 		} else{
 				mem_mex = (memory_message*) event_list[0]->m->magic_struct;
 			// MEM to DECODE
 			event_list = getEventList(dec,mem_s, decode_s, (void*)mem_mex);
 			cout << mexMD << mexDecode << event_list[0]->m->dest << endl;
+			delete event_list[0]->m;
 		}
 	}
 
@@ -146,6 +159,7 @@ int main(){
 	regs.opcode = 0x90;		
 	event_list = getEventList(dec,fetch_s, decode_s, NULL);
 	cout << mexFD << mexDecode << event_list[0]->m->dest << endl;
+	delete event_list[0]->m;
 
 	cout << "***** END *****" << endl;
 	return 0;
