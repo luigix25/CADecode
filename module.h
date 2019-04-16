@@ -27,6 +27,5 @@ public:
 	string getName();
 	int getPriority();
 	vector<event*> initialize();
-	vector<event*> notify(event* e);
-	virtual ~module() = default; //Va aggiunto altrimenti da un warning quando si dealloca onNotify
+	vector<event*> notify(event* e);	
 };

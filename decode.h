@@ -48,7 +48,6 @@ class Decode : public module{
 		memory_message shared_dec_mem;		//nome temporaneo
 	public:
 		Decode(string, int);
-		void onNotify(message*);
-
-
+		void onNotify(message*);		
+		virtual ~Decode() = default; //Va aggiunto altrimenti da un warning quando si dealloca onNotify
 };
