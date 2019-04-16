@@ -22,7 +22,7 @@ void printResult(string from_to, event* ev) {
 	string mexDecode = "DECODE send message to ";
 	cout << from_to << mexDecode << ev->m->dest << endl;
 	delete ev->m;
-	delete[] ev;
+	delete ev;
 }
 
 int main(){
