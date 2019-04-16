@@ -105,6 +105,7 @@ int main(){
 		regs.opcode = 0x61 + i;		
 		// Send frome FETCH TO DECODE
 		event_list = getEventList(dec,fetch_s, decode_s, NULL);
+		mem_mex = (memory_message*) event_list[0]->m->magic_struct;
 		printResult(mexFD, event_list[0]);
 
 		if(i<13){
@@ -112,7 +113,7 @@ int main(){
 			event_list = getEventList(dec,ALU_s, decode_s, NULL);
 			printResult(mexAD, event_list[0]);
 		} else{
-				mem_mex = (memory_message*) event_list[0]->m->magic_struct;
+
 			// MEM to DECODE
 			event_list = getEventList(dec,mem_s, decode_s, (void*)mem_mex);
 			printResult(mexMD, event_list[0]);
@@ -133,14 +134,14 @@ int main(){
 		regs.opcode = 0x81 + i;		
 		// Send frome FETCH TO DECODE
 		event_list = getEventList(dec,fetch_s, decode_s, NULL);
+		mem_mex = (memory_message*) event_list[0]->m->magic_struct;
 		printResult(mexFD, event_list[0]);
 
 		if(i<13){
 			// DECODE must send message to ALU, then ALU send message to DECODE
 			event_list = getEventList(dec,ALU_s, decode_s, NULL);
 			printResult(mexAD, event_list[0]);
-		} else{
-				mem_mex = (memory_message*) event_list[0]->m->magic_struct;
+		} else{			
 			// MEM to DECODE
 			event_list = getEventList(dec,mem_s, decode_s, (void*)mem_mex);
 			printResult(mexMD, event_list[0]);
