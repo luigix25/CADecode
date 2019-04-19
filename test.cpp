@@ -36,7 +36,8 @@ int main(){
 	vector<event*> event_list;	
 	Decode* dec = new Decode("Decode",0);
 	memory_message* mem_mex;
-	int error = 0;
+	int error_count_mex = 0;
+	int error_count_reg = 0;
 
 	string mexFD = "\t  FETCH send messages to DECODE -> ";
 	string mexAD = "\t  ALU send messages to DECODE -> ";
@@ -58,7 +59,7 @@ int main(){
  					};
 
 	cout << "Legenda: INPUT -> OUTPUT" <<endl; 
-	cout << "***** START *****" << endl;
+	cout << "***** START MESSAGES TEST*****" << endl;
 
 	//F0
 	cout << "Format 0" << endl; 
@@ -66,7 +67,7 @@ int main(){
 	regs.opcode = 0x01;
 	event_list = getEventList(dec,fetch_s, decode_s, NULL);
 	if(strcmp(printResult(mexFD, event_list[0]), (char *)fetch_s.c_str())){
-		error++;
+		error_count_mex++;
 		cout << error_msgs << endl; 
 	}
 
@@ -77,7 +78,7 @@ int main(){
 		regs.opcode = 0x20 + i;
 		event_list = getEventList(dec,fetch_s, decode_s, NULL);
 		if(strcmp(printResult(mexFD, event_list[0]), (char *)fetch_s.c_str())){
-			error++;
+			error_count_mex++;
 			cout << error_msgs << endl; 
 		}
 	}
@@ -86,7 +87,7 @@ int main(){
 	regs.opcode = 0x32;
 	event_list = getEventList(dec,fetch_s, decode_s, NULL);
 	if(strcmp(printResult(mexFD, event_list[0]), (char *)fetch_s.c_str())){
-		error++;
+		error_count_mex++;
 		cout << error_msgs << endl; 
 	}
 
@@ -97,7 +98,7 @@ int main(){
 		regs.opcode = 0x40 + i;
 		event_list = getEventList(dec,fetch_s, decode_s, NULL);
 		if(strcmp(printResult(mexFD, event_list[0]), (char *)fetch_s.c_str())){
-			error++;
+			error_count_mex++;
 			cout << error_msgs << endl; 
 		}
 	}
@@ -108,14 +109,14 @@ int main(){
 		// Send frome FETCH TO DECODE
 		event_list = getEventList(dec,fetch_s, decode_s, NULL);
 		if(strcmp(printResult(mexFD, event_list[0]), (char *)ALU_s.c_str())){
-			error++;
+			error_count_mex++;
 			cout << error_msgs << endl; 
 		}
 
 		// DECODE must send message to ALU, then ALU send message to DECODE
 		event_list = getEventList(dec,ALU_s, decode_s, NULL);
 		if(strcmp(printResult(mexAD, event_list[0]), (char *)fetch_s.c_str())){
-			error++;
+			error_count_mex++;
 			cout << error_msgs << endl; 
 		}
 	}
@@ -124,7 +125,7 @@ int main(){
 	regs.opcode = 0x56;
 	event_list = getEventList(dec,fetch_s, decode_s, NULL);
 	if(strcmp(printResult(mexFD, event_list[0]), (char *)fetch_s.c_str())){
-		error++;
+		error_count_mex++;
 		cout << error_msgs << endl; 
 	}
 
@@ -135,7 +136,7 @@ int main(){
 	regs.opcode = 0x60;		
 	event_list = getEventList(dec,fetch_s, decode_s, NULL);
 	if(strcmp(printResult(mexFD, event_list[0]), (char *)fetch_s.c_str())){
-		error++;
+		error_count_mex++;
 		cout << error_msgs << endl; 
 	}
 
@@ -147,25 +148,25 @@ int main(){
 
 		if(i<13){
 			if(strcmp(printResult(mexFD, event_list[0]), (char *)ALU_s.c_str())){
-				error++;
+				error_count_mex++;
 				cout << error_msgs << endl; 
 			}
 			// DECODE must send message to ALU, then ALU send message to DECODE
 			event_list = getEventList(dec,ALU_s, decode_s, NULL);
 			if(strcmp(printResult(mexAD, event_list[0]), (char *)fetch_s.c_str())){
-				error++;
+				error_count_mex++;
 				cout << error_msgs << endl; 
 			}
 		} else{
 			if(strcmp(printResult(mexFD, event_list[0]), (char *)mem_s.c_str())){
-				error++;
+				error_count_mex++;
 				cout << error_msgs << endl; 
 			}
 			// MEM to DECODE
 			mem_mex = (memory_message*) event_list[0]->m->magic_struct;
 			event_list = getEventList(dec,mem_s, decode_s, (void*)mem_mex);
 			if(strcmp(printResult(mexMD, event_list[0]), (char *)fetch_s.c_str())){
-				error++;
+				error_count_mex++;
 				cout << error_msgs << endl; 
 			}
 		}
@@ -178,7 +179,7 @@ int main(){
 	regs.opcode = 0x80;		
 	event_list = getEventList(dec,fetch_s, decode_s, NULL);
 	if(strcmp(printResult(mexFD, event_list[0]), (char *)fetch_s.c_str())){
-		error++;
+		error_count_mex++;
 		cout << error_msgs << endl; 
 	}
 
@@ -191,25 +192,25 @@ int main(){
 
 		if(i<13){
 			if(strcmp(printResult(mexFD, event_list[0]), (char *)ALU_s.c_str())){
-				error++;
+				error_count_mex++;
 				cout << error_msgs << endl; 
 			}
 			// DECODE must send message to ALU, then ALU send message to DECODE
 			event_list = getEventList(dec,ALU_s, decode_s, NULL);
 			if(strcmp(printResult(mexAD, event_list[0]), (char *)fetch_s.c_str())){
-				error++;
+				error_count_mex++;
 				cout << error_msgs << endl; 
 			}
 		} else{	
 			if(strcmp(printResult(mexFD, event_list[0]), (char *)mem_s.c_str())){
-				error++;
+				error_count_mex++;
 				cout << error_msgs << endl; 
 			}		
 			// MEM to DECODE
 			mem_mex = (memory_message*) event_list[0]->m->magic_struct;
 			event_list = getEventList(dec,mem_s, decode_s, (void*)mem_mex);
 			if(strcmp(printResult(mexMD, event_list[0]), (char *)fetch_s.c_str())){
-				error++;
+				error_count_mex++;
 				cout << error_msgs << endl; 
 			}
 		}
@@ -219,12 +220,97 @@ int main(){
 	regs.opcode = 0x90;		
 	event_list = getEventList(dec,fetch_s, decode_s, NULL);
 	if(strcmp(printResult(mexFD, event_list[0]), (char *)fetch_s.c_str())){
-		error++;
+		error_count_mex++;
 		cout << error_msgs << endl; 
 	}
 
-	cout << "***** END *****" << endl;
-	cout << "Errors: " << error << endl;
+	cout << "***** END MESSAGES TEST *****" << endl;
+	cout << "Messages errors: " << error_count_mex << endl;
+	cout << "***** START REGISTERS TEST *****" << endl;
+
+	// Test conditional JUMP: JBE F1
+	cout << "\t" << "JBE F1 registers test: ";
+	regs.opcode = 0x25;
+	global_regs.flag = 0x0021;
+	regs.ip = 0x0000;
+	regs.source = 0x0010;
+	event_list = getEventList(dec,fetch_s, decode_s, NULL);
+	if(regs.ip != 0x0010){
+		error_count_reg++;
+		cout << "[ERR] Wrong ip after message" << endl;
+	} else{
+		cout << "OK" << endl;
+	}
+
+	// Test conditional JUMP: JBE F2
+	cout << "\t" << "JBE F2 registers test: ";
+	regs.opcode = 0x45;
+	global_regs.flag = 0x0021;
+	regs.ip = 0x0000;
+	regs.source = 0x0000; //AX
+	global_regs.general_regs[0] = 0x0010;
+	event_list = getEventList(dec,fetch_s, decode_s, NULL);
+	if(regs.ip != 0x0010){
+		error_count_reg++;
+		cout << "[ERR] Wrong ip after message" << endl;
+	} else{
+		cout << "OK" << endl;
+	}
+
+	// Test MOV F3
+	cout << "\t" << "MOV F3 registers test: ";
+	regs.opcode = 0x60;
+	regs.source = 0x0011; // immediato
+	regs.dest = 0x0001; // BX
+	global_regs.general_regs[1] = 0x0000;
+	event_list = getEventList(dec,fetch_s, decode_s, NULL);
+	if(global_regs.general_regs[1] != 0x0011){
+		error_count_reg++;
+		cout << "[ERR] Wrong reg value after message" << endl;
+	} else{
+		cout << "OK" << endl;
+	}
+
+	// Test MOV F4
+	cout << "\t" << "MOV F4 registers test: ";
+	regs.opcode = 0x80;
+	regs.source = 0x0002; // CX
+	global_regs.general_regs[2] = 0x0011;
+	regs.dest = 0x0003; // DX
+	global_regs.general_regs[3] = 0x0000;
+	event_list = getEventList(dec,fetch_s, decode_s, NULL);
+	if(global_regs.general_regs[3] != 0x0011){
+		error_count_reg++;
+		cout << "[ERR] Wrong reg value after message" << endl;
+	} else{
+		cout << "OK" << endl;
+	}
+
+	// Test XCHG F4
+	cout << "\t" << "XCHG F4 registers test: ";
+	regs.opcode = 0x90;
+	regs.source = 0x0002; // CX
+	global_regs.general_regs[2] = 0x0011;
+	regs.dest = 0x0003; // DX
+	global_regs.general_regs[3] = 0x0022;
+	event_list = getEventList(dec,fetch_s, decode_s, NULL);
+	if(global_regs.general_regs[3] != 0x0011 || global_regs.general_regs[2] != 0x0022){
+		error_count_reg++;
+		cout << "[ERR] Wrong reg value after message" << endl;
+	} else{
+		cout << "OK" << endl;
+	}
+
+
+
+
+
+
+
+	cout << "***** END REGISTERS TEST *****" << endl;
+	cout << "Registers errors: " << error_count_reg << endl;
+
+	cout << "Global errors: " << error_count_mex + error_count_reg << endl;
 	delete dec;
 	return 0;
 }
