@@ -18,11 +18,13 @@ vector<event*> getEventList(Decode* dec, string& source, string& dest, void* mag
 	return dec->notify(&ev);
 }
 
-void printResult(string from_to, event* ev) {
+char * printResult(string from_to, event* ev) {
 	string mexDecode = "DECODE send message to ";
-	cout << from_to << mexDecode << ev->m->dest << endl;
+	string ret = ev->m->dest;
+	cout << from_to << mexDecode << ret << endl;
 	delete ev->m;
 	delete ev;
+	return (char *)ret.c_str();
 }
 
 int main(){
@@ -30,13 +32,16 @@ int main(){
 	string decode_s(DECODE);
 	string ALU_s(ALU);
 	string mem_s(MEMORY);
+
 	vector<event*> event_list;	
 	Decode* dec = new Decode("Decode",0);
 	memory_message* mem_mex;
+	int error = 0;
 
 	string mexFD = "\t  FETCH send messages to DECODE -> ";
 	string mexAD = "\t  ALU send messages to DECODE -> ";
 	string mexMD = "\t  MEMORY send messages to DECODE -> ";
+	string error_msgs = "\t\t\t[ERR] wrong destination";
 
 	int nameJump_length = 18;
 	string nameJump[nameJump_length] = {	
@@ -60,7 +65,10 @@ int main(){
 	cout << "\tNOP" << endl;
 	regs.opcode = 0x01;
 	event_list = getEventList(dec,fetch_s, decode_s, NULL);
-	printResult(mexFD, event_list[0]);
+	if(strcmp(printResult(mexFD, event_list[0]), (char *)fetch_s.c_str())){
+		error++;
+		cout << error_msgs << endl; 
+	}
 
 	//F1
 	cout << "Format 1" << endl;
@@ -68,7 +76,10 @@ int main(){
 		cout << "\t" << nameJump[i] << endl;
 		regs.opcode = 0x20 + i;
 		event_list = getEventList(dec,fetch_s, decode_s, NULL);
-		printResult(mexFD, event_list[0]);
+		if(strcmp(printResult(mexFD, event_list[0]), (char *)fetch_s.c_str())){
+			error++;
+			cout << error_msgs << endl; 
+		}
 	}
 
 	//F2
@@ -77,7 +88,10 @@ int main(){
 		cout << "\t" << nameJump[i] << endl;
 		regs.opcode = 0x40 + i;
 		event_list = getEventList(dec,fetch_s, decode_s, NULL);
-		printResult(mexFD, event_list[0]);
+		if(strcmp(printResult(mexFD, event_list[0]), (char *)fetch_s.c_str())){
+			error++;
+			cout << error_msgs << endl; 
+		}
 	}
 
 	for(int i = 0; i<nameF2_length; i++){
@@ -85,11 +99,17 @@ int main(){
 		regs.opcode = 0x52 + i;		
 		// Send frome FETCH TO DECODE
 		event_list = getEventList(dec,fetch_s, decode_s, NULL);
-		printResult(mexFD, event_list[0]);
+		if(strcmp(printResult(mexFD, event_list[0]), (char *)ALU_s.c_str())){
+			error++;
+			cout << error_msgs << endl; 
+		}
 
 		// DECODE must send message to ALU, then ALU send message to DECODE
 		event_list = getEventList(dec,ALU_s, decode_s, NULL);
-		printResult(mexAD, event_list[0]);
+		if(strcmp(printResult(mexAD, event_list[0]), (char *)fetch_s.c_str())){
+			error++;
+			cout << error_msgs << endl; 
+		}
 	}
 
 	//F3
@@ -98,25 +118,40 @@ int main(){
 	cout << "\t" << "MOV" << endl;
 	regs.opcode = 0x60;		
 	event_list = getEventList(dec,fetch_s, decode_s, NULL);
-	printResult(mexFD, event_list[0]);
+	if(strcmp(printResult(mexFD, event_list[0]), (char *)fetch_s.c_str())){
+		error++;
+		cout << error_msgs << endl; 
+	}
 
 	for(int i = 0; i<nameF3F4_length; i++){
 		cout << "\t" << nameF3F4[i] << endl;
 		regs.opcode = 0x61 + i;		
 		// Send frome FETCH TO DECODE
 		event_list = getEventList(dec,fetch_s, decode_s, NULL);
-		mem_mex = (memory_message*) event_list[0]->m->magic_struct;
-		printResult(mexFD, event_list[0]);
 
 		if(i<13){
+			if(strcmp(printResult(mexFD, event_list[0]), (char *)ALU_s.c_str())){
+				error++;
+				cout << error_msgs << endl; 
+			}
 			// DECODE must send message to ALU, then ALU send message to DECODE
 			event_list = getEventList(dec,ALU_s, decode_s, NULL);
-			printResult(mexAD, event_list[0]);
+			if(strcmp(printResult(mexAD, event_list[0]), (char *)fetch_s.c_str())){
+				error++;
+				cout << error_msgs << endl; 
+			}
 		} else{
-
+			if(strcmp(printResult(mexFD, event_list[0]), (char *)mem_s.c_str())){
+				error++;
+				cout << error_msgs << endl; 
+			}
 			// MEM to DECODE
+			mem_mex = (memory_message*) event_list[0]->m->magic_struct;
 			event_list = getEventList(dec,mem_s, decode_s, (void*)mem_mex);
-			printResult(mexMD, event_list[0]);
+			if(strcmp(printResult(mexMD, event_list[0]), (char *)fetch_s.c_str())){
+				error++;
+				cout << error_msgs << endl; 
+			}
 		}
 	}
 
@@ -126,7 +161,10 @@ int main(){
 	cout << "\t" << "MOV" << endl;
 	regs.opcode = 0x80;		
 	event_list = getEventList(dec,fetch_s, decode_s, NULL);
-	printResult(mexFD, event_list[0]);
+	if(strcmp(printResult(mexFD, event_list[0]), (char *)fetch_s.c_str())){
+		error++;
+		cout << error_msgs << endl; 
+	}
 
 
 	for(int i = 0; i<nameF3F4_length; i++){
@@ -134,28 +172,44 @@ int main(){
 		regs.opcode = 0x81 + i;		
 		// Send frome FETCH TO DECODE
 		event_list = getEventList(dec,fetch_s, decode_s, NULL);
-		mem_mex = (memory_message*) event_list[0]->m->magic_struct;
-		printResult(mexFD, event_list[0]);
 
 		if(i<13){
+			if(strcmp(printResult(mexFD, event_list[0]), (char *)ALU_s.c_str())){
+				error++;
+				cout << error_msgs << endl; 
+			}
 			// DECODE must send message to ALU, then ALU send message to DECODE
 			event_list = getEventList(dec,ALU_s, decode_s, NULL);
-			printResult(mexAD, event_list[0]);
-		} else{			
+			if(strcmp(printResult(mexAD, event_list[0]), (char *)fetch_s.c_str())){
+				error++;
+				cout << error_msgs << endl; 
+			}
+		} else{	
+			if(strcmp(printResult(mexFD, event_list[0]), (char *)mem_s.c_str())){
+				error++;
+				cout << error_msgs << endl; 
+			}		
 			// MEM to DECODE
+			mem_mex = (memory_message*) event_list[0]->m->magic_struct;
 			event_list = getEventList(dec,mem_s, decode_s, (void*)mem_mex);
-			printResult(mexMD, event_list[0]);
+			if(strcmp(printResult(mexMD, event_list[0]), (char *)fetch_s.c_str())){
+				error++;
+				cout << error_msgs << endl; 
+			}
 		}
 	}
 
 	cout << "\t" << "XCHG" << endl;
 	regs.opcode = 0x90;		
 	event_list = getEventList(dec,fetch_s, decode_s, NULL);
-	printResult(mexFD, event_list[0]);
+	if(strcmp(printResult(mexFD, event_list[0]), (char *)fetch_s.c_str())){
+		error++;
+		cout << error_msgs << endl; 
+	}
 
 	cout << "***** END *****" << endl;
+	cout << "Errors: " << error << endl;
 	delete dec;
 	return 0;
 }
 
-//STORE	01101111
