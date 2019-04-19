@@ -82,6 +82,14 @@ int main(){
 		}
 	}
 
+	cout << "\t" << "JMP" << endl;
+	regs.opcode = 0x32;
+	event_list = getEventList(dec,fetch_s, decode_s, NULL);
+	if(strcmp(printResult(mexFD, event_list[0]), (char *)fetch_s.c_str())){
+		error++;
+		cout << error_msgs << endl; 
+	}
+
 	//F2
 	cout << "Format 2" << endl;
 	for(int i = 0; i<nameJump_length; i++){
@@ -110,6 +118,14 @@ int main(){
 			error++;
 			cout << error_msgs << endl; 
 		}
+	}
+
+	cout << "\t" << "JMP" << endl;
+	regs.opcode = 0x56;
+	event_list = getEventList(dec,fetch_s, decode_s, NULL);
+	if(strcmp(printResult(mexFD, event_list[0]), (char *)fetch_s.c_str())){
+		error++;
+		cout << error_msgs << endl; 
 	}
 
 	//F3

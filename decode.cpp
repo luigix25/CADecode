@@ -235,6 +235,9 @@ message* Decode::format_1(){
 				regs.ip = regs.source;
 			}
 			break;
+		case 18:
+			regs.ip = regs.source;
+			break;
 		default:
 			cerr<<"Unknown Instruction Format 1"<<endl;
 			exit(-1);
@@ -332,12 +335,15 @@ message* Decode::format_2(){
 				regs.ip = global_regs.general_regs[regs.source];
 			}
 			break;
-		case 18 ... 21 :						//INC, DEC, NEG, NOT
+		case 18 ... 21:						//INC, DEC, NEG, NOT
 			alu_regs.operand1 = global_regs.general_regs[regs.source];		    //registro per la ALU dove troverà il primo operando
 			alu_regs.operand2 = 0;					    //controllare se serve
 			alu_regs.destination_reg = regs.source;
 			alu_regs.opcode = regs.opcode;
 			return create_message_for_ALU();
+			break;
+		case 22:
+			regs.ip = global_regs.general_regs[regs.source];
 			break;
 		
 		default:
