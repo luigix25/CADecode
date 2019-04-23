@@ -43,6 +43,10 @@ int main(){
 	int error_count_mex = 0;
 	int error_count_reg = 0;
 
+	bool error;
+
+	memory_message * mm;
+
 	string mexFD = "\t  FETCH send messages to DECODE -> ";
 	string mexAD = "\t  ALU send messages to DECODE -> ";
 	string mexMD = "\t  MEMORY send messages to DECODE -> ";
@@ -178,7 +182,7 @@ int main(){
 	cout << "***** START REGISTERS TEST *****" << endl;
 
 	// Test conditional JUMP: JBE F1
-	cout << "\t" << "JBE F1 registers test: ";
+	cout << "\t F1 " << "JBE registers test: ";
 	regs.opcode = 0x25;
 	global_regs.flag = 0x0021;
 	regs.ip = 0x0000;
@@ -186,13 +190,13 @@ int main(){
 	event_list = getEventList(dec,fetch_s, decode_s, NULL);
 	if(regs.ip != 0x0010){
 		error_count_reg++;
-		cout << "[ERR] Wrong ip after message" << endl;
+		cout << "\t [ERR] Wrong ip after message" << endl;
 	} else{
-		cout << "OK" << endl;
+		cout << "\t OK" << endl;
 	}
 
 	// Test conditional JUMP: JBE F2
-	cout << "\t" << "JBE F2 registers test: ";
+	cout << "\t F2 " << "JBE registers test: ";
 	regs.opcode = 0x45;
 	global_regs.flag = 0x0021;
 	regs.ip = 0x0000;
@@ -201,13 +205,42 @@ int main(){
 	event_list = getEventList(dec,fetch_s, decode_s, NULL);
 	if(regs.ip != 0x0010){
 		error_count_reg++;
-		cout << "[ERR] Wrong ip after message" << endl;
+		cout << "\t [ERR] Wrong ip after message" << endl;
 	} else{
-		cout << "OK" << endl;
+		cout << "\t OK" << endl;
+	}
+
+	// Test INC F2 
+	cout << "\t F2 " << "INC registers test: ";
+	regs.opcode = 0x52;
+	regs.source = 0x0000; //AX
+	global_regs.general_regs[regs.source] = 0xfffe;
+	event_list = getEventList(dec,fetch_s, decode_s, NULL);
+	error = false;	
+	if(alu_regs.operand1 != 0xfffe){
+		error = true;
+		cout<< endl << "\t [ERR] Wrong operand1 in ALU reg";
+	}
+
+	if(alu_regs.destination_reg != 0x00){
+		error = true;
+		cout << endl  << "\t [ERR] Wrong destination_reg in ALU reg";
+	}
+
+	if(alu_regs.opcode !=  regs.opcode){
+		error = true;
+		cout << endl  << "\t [ERR] Wrong opcode in ALU reg";
+	}
+
+	if(error){
+		error_count_reg++;
+		cout << endl;
+	} else{
+		cout << "\t OK" << endl;
 	}
 
 	// Test MOV F3
-	cout << "\t" << "MOV F3 registers test: ";
+	cout << "\t F3 " << "MOV registers test: ";
 	regs.opcode = 0x60;
 	regs.source = 0x0011; // immediato
 	regs.dest = 0x0001; // BX
@@ -215,13 +248,81 @@ int main(){
 	event_list = getEventList(dec,fetch_s, decode_s, NULL);
 	if(global_regs.general_regs[1] != 0x0011){
 		error_count_reg++;
-		cout << "[ERR] Wrong reg value after message" << endl;
+		cout << "\t [ERR] Wrong reg value after message" << endl;
 	} else{
-		cout << "OK" << endl;
+		cout << "\t OK" << endl;
+	}
+
+	// Test ADD F3
+	cout << "\t F3 " << "ADD registers test: ";
+	regs.opcode = 0x61;
+	regs.source = 0xfffe; 
+	regs.dest = 0x01; //BX 
+	global_regs.general_regs[regs.dest] = 0x0001;
+
+	event_list = getEventList(dec,fetch_s, decode_s, NULL);
+	error = false;	
+	if(alu_regs.operand1 != 0xfffe){
+		error = true;
+		cout<< endl << "\t [ERR] Wrong operand1 in ALU reg";
+	}
+
+	if(alu_regs.operand2 != 0x0001){
+		error = true;
+		cout<< endl << "\t [ERR] Wrong operand2 in ALU reg";
+	}
+
+	if(alu_regs.destination_reg != 0x01){
+		error = true;
+		cout << endl  << "\t [ERR] Wrong destination_reg in ALU reg";
+	}
+
+	if(alu_regs.opcode !=  regs.opcode){
+		error = true;
+		cout << endl  << "\t [ERR] Wrong opcode in ALU reg";
+	}
+
+	if(error){
+		error_count_reg++;
+		cout << endl;
+	} else{
+		cout << "\t OK" << endl;
+	}
+
+	// Test STORE F3
+	cout << "\t F3 " << "STORE message content test: ";
+	regs.opcode = 0x6F;
+	regs.source = 0xfefe; 
+	regs.dest = 0x02; //CX 
+	global_regs.general_regs[regs.dest] = 0x0001;
+
+	event_list = getEventList(dec,fetch_s, decode_s, NULL);
+	mm = (memory_message *) event_list[0]->m->magic_struct;
+
+	if(!mm->type){
+		error = true;
+		cout << endl  << "\t [ERR] Wrong type in memory_message";
+	}
+
+	if(mm->address != 0x0001){
+		error = true;
+		cout << endl  << "\t [ERR] Wrong address in memory_message";
+	}
+
+	if(mm->data != 0xfefe){
+		error = true;
+		cout << endl  << "\t [ERR] Wrong data in memory_message";
+	}
+
+	if(error){
+		error_count_reg++;
+		cout << endl;
+	} else{
+		cout << " OK" << endl;
 	}
 
 	// Test MOV F4
-	cout << "\t" << "MOV F4 registers test: ";
+	cout << "\t F4 " << "MOV registers test: ";
 	regs.opcode = 0x80;
 	regs.source = 0x0002; // CX
 	global_regs.general_regs[2] = 0x0011;
@@ -230,13 +331,83 @@ int main(){
 	event_list = getEventList(dec,fetch_s, decode_s, NULL);
 	if(global_regs.general_regs[3] != 0x0011){
 		error_count_reg++;
-		cout << "[ERR] Wrong reg value after message" << endl;
+		cout << "\t [ERR] Wrong reg value after message" << endl;
 	} else{
-		cout << "OK" << endl;
+		cout << "\t OK" << endl;
+	}
+
+	// Test ADD F4
+	cout << "\t F4 " << "ADD registers test: ";
+	regs.opcode = 0x81;
+	regs.source = 0x0000; //AX 
+	regs.dest = 0x01; //BX 
+	global_regs.general_regs[regs.source] = 0xfffe;
+	global_regs.general_regs[regs.dest] = 0x0001;
+
+	event_list = getEventList(dec,fetch_s, decode_s, NULL);
+	error = false;	
+	if(alu_regs.operand1 != 0xfffe){
+		error = true;
+		cout<< endl << "\t [ERR] Wrong operand1 in ALU reg";
+	}
+
+	if(alu_regs.operand2 != 0x0001){
+		error = true;
+		cout<< endl << "\t [ERR] Wrong operand2 in ALU reg";
+	}
+
+	if(alu_regs.destination_reg != 0x01){
+		error = true;
+		cout << endl  << "\t [ERR] Wrong destination_reg in ALU reg";
+	}
+
+	if(alu_regs.opcode !=  regs.opcode){
+		error = true;
+		cout << endl  << "\t [ERR] Wrong opcode in ALU reg";
+	}
+
+	if(error){
+		error_count_reg++;
+		cout << endl;
+	} else{
+		cout << "\t OK" << endl;
+	}
+
+	// Test STORE F4
+	cout << "\t F4 " << "STORE message content test: ";
+	regs.opcode = 0x8F;
+	regs.source = 0x0001; //BX 
+	regs.dest = 0x02; //CX 
+	global_regs.general_regs[regs.source] = 0xfefe;
+	global_regs.general_regs[regs.dest] = 0x0001;
+
+	event_list = getEventList(dec,fetch_s, decode_s, NULL);
+	mm = (memory_message *) event_list[0]->m->magic_struct;
+
+	if(!mm->type){
+		error = true;
+		cout << endl  << "\t [ERR] Wrong type in memory_message";
+	}
+
+	if(mm->address != 0x0001){
+		error = true;
+		cout << endl  << "\t [ERR] Wrong address in memory_message";
+	}
+
+	if(mm->data != 0xfefe){
+		error = true;
+		cout << endl  << "\t [ERR] Wrong data in memory_message";
+	}
+
+	if(error){
+		error_count_reg++;
+		cout << endl;
+	} else{
+		cout << " OK" << endl;
 	}
 
 	// Test XCHG F4
-	cout << "\t" << "XCHG F4 registers test: ";
+	cout << "\t F4 " << "XCHG registers test: ";
 	regs.opcode = 0x90;
 	regs.source = 0x0002; // CX
 	global_regs.general_regs[2] = 0x0011;
@@ -245,16 +416,10 @@ int main(){
 	event_list = getEventList(dec,fetch_s, decode_s, NULL);
 	if(global_regs.general_regs[3] != 0x0011 || global_regs.general_regs[2] != 0x0022){
 		error_count_reg++;
-		cout << "[ERR] Wrong reg value after message" << endl;
+		cout << " [ERR] Wrong reg value after message" << endl;
 	} else{
-		cout << "OK" << endl;
+		cout << " \t OK" << endl;
 	}
-
-
-
-
-
-
 
 	cout << "***** END REGISTERS TEST *****" << endl;
 	cout << "Messages errors: " << error_count_mex << endl;
