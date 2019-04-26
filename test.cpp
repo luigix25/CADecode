@@ -20,7 +20,8 @@ vector<event*> getEventList(Decode* dec, string& source, string& dest, void* mag
 
 int printResult(string from_to, event* ev, string expected) {
 	string mexDecode = "DECODE send message to ";
-	string dest = ev->m->dest;
+	string dest;
+	strcpy((char *)dest.c_str(), ev->m->dest);
 	cout << from_to << mexDecode << dest << endl;
 	delete ev->m;
 	delete ev;
@@ -135,9 +136,10 @@ int main(){
 			event_list = getEventList(dec,ALU_s, decode_s, NULL);
 			error_count_mex += printResult(mexAD, event_list[0], fetch_s);
 		} else{
+			mem_mex = (memory_message*) event_list[0]->m->magic_struct;
 			error_count_mex += printResult(mexFD, event_list[0], mem_s);
 			// MEM to DECODE
-			mem_mex = (memory_message*) event_list[0]->m->magic_struct;
+
 			event_list = getEventList(dec,mem_s, decode_s, (void*)mem_mex);
 			error_count_mex += printResult(mexMD, event_list[0], fetch_s);
 		}
@@ -164,9 +166,10 @@ int main(){
 			event_list = getEventList(dec,ALU_s, decode_s, NULL);
 			error_count_mex += printResult(mexAD, event_list[0], fetch_s);
 		} else{	
+			mem_mex = (memory_message*) event_list[0]->m->magic_struct;
 			error_count_mex += printResult(mexFD, event_list[0], mem_s);		
 			// MEM to DECODE
-			mem_mex = (memory_message*) event_list[0]->m->magic_struct;
+		
 			event_list = getEventList(dec,mem_s, decode_s, (void*)mem_mex);
 			error_count_mex += printResult(mexMD, event_list[0], fetch_s);
 		}
@@ -194,7 +197,8 @@ int main(){
 	} else{
 		cout << "\t OK" << endl;
 	}
-
+	delete event_list[0]->m;
+	delete event_list[0];
 	// Test conditional JUMP: JBE F2
 	cout << "\t F2 " << "JBE registers test: ";
 	regs.opcode = 0x45;
@@ -209,7 +213,8 @@ int main(){
 	} else{
 		cout << "\t OK" << endl;
 	}
-
+	delete event_list[0]->m;
+	delete event_list[0];
 	// Test INC F2 
 	cout << "\t F2 " << "INC registers test: ";
 	regs.opcode = 0x52;
@@ -238,7 +243,8 @@ int main(){
 	} else{
 		cout << "\t OK" << endl;
 	}
-
+	delete event_list[0]->m;
+	delete event_list[0];
 	// Test MOV F3
 	cout << "\t F3 " << "MOV registers test: ";
 	regs.opcode = 0x60;
@@ -252,7 +258,8 @@ int main(){
 	} else{
 		cout << "\t OK" << endl;
 	}
-
+	delete event_list[0]->m;
+	delete event_list[0];
 	// Test ADD F3
 	cout << "\t F3 " << "ADD registers test: ";
 	regs.opcode = 0x61;
@@ -288,7 +295,8 @@ int main(){
 	} else{
 		cout << "\t OK" << endl;
 	}
-
+	delete event_list[0]->m;
+	delete event_list[0];
 	// Test STORE F3
 	cout << "\t F3 " << "STORE message content test: ";
 	regs.opcode = 0x6F;
@@ -320,7 +328,8 @@ int main(){
 	} else{
 		cout << " OK" << endl;
 	}
-
+	delete event_list[0]->m;
+	delete event_list[0];
 	// Test MOV F4
 	cout << "\t F4 " << "MOV registers test: ";
 	regs.opcode = 0x80;
@@ -335,7 +344,8 @@ int main(){
 	} else{
 		cout << "\t OK" << endl;
 	}
-
+	delete event_list[0]->m;
+	delete event_list[0];
 	// Test ADD F4
 	cout << "\t F4 " << "ADD registers test: ";
 	regs.opcode = 0x81;
@@ -372,7 +382,8 @@ int main(){
 	} else{
 		cout << "\t OK" << endl;
 	}
-
+	delete event_list[0]->m;
+	delete event_list[0];
 	// Test STORE F4
 	cout << "\t F4 " << "STORE message content test: ";
 	regs.opcode = 0x8F;
@@ -405,6 +416,8 @@ int main(){
 	} else{
 		cout << " OK" << endl;
 	}
+		delete event_list[0]->m;
+	delete event_list[0];
 
 	// Test XCHG F4
 	cout << "\t F4 " << "XCHG registers test: ";
@@ -414,6 +427,8 @@ int main(){
 	regs.dest = 0x0003; // DX
 	global_regs.general_regs[3] = 0x0022;
 	event_list = getEventList(dec,fetch_s, decode_s, NULL);
+	delete event_list[0]->m;
+	delete event_list[0];
 	if(global_regs.general_regs[3] != 0x0011 || global_regs.general_regs[2] != 0x0022){
 		error_count_reg++;
 		cout << " [ERR] Wrong reg value after message" << endl;
