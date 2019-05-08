@@ -191,7 +191,7 @@ int main(){
 	regs.ip = 0x0000;
 	regs.source = 0x0010;
 	event_list = getEventList(dec,fetch_s, decode_s, NULL);
-	if(regs.ip != 0x0010){
+	if(regs.ip != regs.source){
 		error_count_reg++;
 		cout << "\t [ERR] Wrong ip after message" << endl;
 	} else{
@@ -205,9 +205,9 @@ int main(){
 	global_regs.flag = 0x0021;
 	regs.ip = 0x0000;
 	regs.source = 0x0000; //AX
-	global_regs.general_regs[0] = 0x0010;
+	global_regs.general_regs[regs.source] = 0x0010;
 	event_list = getEventList(dec,fetch_s, decode_s, NULL);
-	if(regs.ip != 0x0010){
+	if(regs.ip != global_regs.general_regs[regs.source]){
 		error_count_reg++;
 		cout << "\t [ERR] Wrong ip after message" << endl;
 	} else{
@@ -222,12 +222,12 @@ int main(){
 	global_regs.general_regs[regs.source] = 0xfffe;
 	event_list = getEventList(dec,fetch_s, decode_s, NULL);
 	error = false;	
-	if(alu_regs.operand1 != 0xfffe){
+	if(alu_regs.operand1 != global_regs.general_regs[regs.source]){
 		error = true;
 		cout<< endl << "\t [ERR] Wrong operand1 in ALU reg";
 	}
 
-	if(alu_regs.destination_reg != 0x00){
+	if(alu_regs.destination_reg != regs.source){
 		error = true;
 		cout << endl  << "\t [ERR] Wrong destination_reg in ALU reg";
 	}
@@ -250,9 +250,9 @@ int main(){
 	regs.opcode = 0x60;
 	regs.source = 0x0011; // immediato
 	regs.dest = 0x0001; // BX
-	global_regs.general_regs[1] = 0x0000;
+	global_regs.general_regs[regs.dest] = 0x0000;
 	event_list = getEventList(dec,fetch_s, decode_s, NULL);
-	if(global_regs.general_regs[1] != 0x0011){
+	if(global_regs.general_regs[regs.dest] != regs.source){
 		error_count_reg++;
 		cout << "\t [ERR] Wrong reg value after message" << endl;
 	} else{
@@ -269,17 +269,17 @@ int main(){
 
 	event_list = getEventList(dec,fetch_s, decode_s, NULL);
 	error = false;	
-	if(alu_regs.operand1 != 0xfffe){
+	if(alu_regs.operand1 != regs.source){
 		error = true;
 		cout<< endl << "\t [ERR] Wrong operand1 in ALU reg";
 	}
 
-	if(alu_regs.operand2 != 0x0001){
+	if(alu_regs.operand2 != global_regs.general_regs[regs.dest]){
 		error = true;
 		cout<< endl << "\t [ERR] Wrong operand2 in ALU reg";
 	}
 
-	if(alu_regs.destination_reg != 0x01){
+	if(alu_regs.destination_reg != regs.dest){
 		error = true;
 		cout << endl  << "\t [ERR] Wrong destination_reg in ALU reg";
 	}
@@ -334,11 +334,11 @@ int main(){
 	cout << "\t F4 " << "MOV registers test: ";
 	regs.opcode = 0x80;
 	regs.source = 0x0002; // CX
-	global_regs.general_regs[2] = 0x0011;
+	global_regs.general_regs[regs.source] = 0x0011;
 	regs.dest = 0x0003; // DX
-	global_regs.general_regs[3] = 0x0000;
+	global_regs.general_regs[regs.dest] = 0x0000;
 	event_list = getEventList(dec,fetch_s, decode_s, NULL);
-	if(global_regs.general_regs[3] != 0x0011){
+	if(global_regs.general_regs[regs.dest] != global_regs.general_regs[regs.source]){
 		error_count_reg++;
 		cout << "\t [ERR] Wrong reg value after message" << endl;
 	} else{
@@ -356,17 +356,17 @@ int main(){
 
 	event_list = getEventList(dec,fetch_s, decode_s, NULL);
 	error = false;	
-	if(alu_regs.operand1 != 0xfffe){
+	if(alu_regs.operand1 != global_regs.general_regs[regs.source]){
 		error = true;
 		cout<< endl << "\t [ERR] Wrong operand1 in ALU reg";
 	}
 
-	if(alu_regs.operand2 != 0x0001){
+	if(alu_regs.operand2 != global_regs.general_regs[regs.dest] ){
 		error = true;
 		cout<< endl << "\t [ERR] Wrong operand2 in ALU reg";
 	}
 
-	if(alu_regs.destination_reg != 0x01){
+	if(alu_regs.destination_reg != regs.dest){
 		error = true;
 		cout << endl  << "\t [ERR] Wrong destination_reg in ALU reg";
 	}
@@ -400,12 +400,12 @@ int main(){
 		cout << endl  << "\t [ERR] Wrong type in memory_message";
 	}
 
-	if(mm->address != 0x0001){
+	if(mm->address != global_regs.general_regs[regs.dest]){
 		error = true;
 		cout << endl  << "\t [ERR] Wrong address in memory_message";
 	}
 
-	if(mm->data != 0xfefe){
+	if(mm->data != global_regs.general_regs[regs.source]){
 		error = true;
 		cout << endl  << "\t [ERR] Wrong data in memory_message";
 	}
@@ -423,13 +423,15 @@ int main(){
 	cout << "\t F4 " << "XCHG registers test: ";
 	regs.opcode = 0x90;
 	regs.source = 0x0002; // CX
-	global_regs.general_regs[2] = 0x0011;
+	uint16_t oldSourceValue = 0x0011;
+	uint16_t oldDestValue = 0x0022;
+	global_regs.general_regs[regs.source] = oldSourceValue;
 	regs.dest = 0x0003; // DX
-	global_regs.general_regs[3] = 0x0022;
+	global_regs.general_regs[regs.dest] = oldDestValue;
 	event_list = getEventList(dec,fetch_s, decode_s, NULL);
 	delete event_list[0]->m;
 	delete event_list[0];
-	if(global_regs.general_regs[3] != 0x0011 || global_regs.general_regs[2] != 0x0022){
+	if(global_regs.general_regs[regs.dest] != oldSourceValue || global_regs.general_regs[regs.source] != oldDestValue){
 		error_count_reg++;
 		cout << " [ERR] Wrong reg value after message" << endl;
 	} else{
