@@ -312,12 +312,12 @@ int main(){
 		cout << endl  << "\t [ERR] Wrong type in memory_message";
 	}
 
-	if(mm->address != 0x0001){
+	if(mm->address != regs.source){
 		error = true;
 		cout << endl  << "\t [ERR] Wrong address in memory_message";
 	}
 
-	if(mm->data != 0xfefe){
+	if(mm->data != global_regs.general_regs[regs.dest]){
 		error = true;
 		cout << endl  << "\t [ERR] Wrong data in memory_message";
 	}

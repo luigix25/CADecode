@@ -374,7 +374,7 @@ message* Decode::format_3(){
 			return create_message_for_memory(0, regs.source);
 			break;
 		case 15:							//STORE immediato, registro  (in source trovo il dato, in dest trovo l'indirizzo)
-			return create_message_for_memory(1,global_regs.general_regs[regs.dest],regs.source);		//Normalmente sarebbe dovuto essere il contrario, ma in fase di fetching l'indirizzo di 												//memoria in cui memorizzare il dato viene passato nel registro source e non nel registro 													//dest; per questo motivo abbiamo i registri invertiti nell'inviare il messaggio
+			return create_message_for_memory(1,regs.source,global_regs.general_regs[regs.dest]);		//Normalmente sarebbe dovuto essere il contrario, ma in fase di fetching l'indirizzo di 												//memoria in cui memorizzare il dato viene passato nel registro source e non nel registro 													//dest; per questo motivo abbiamo i registri invertiti nell'inviare il messaggio
 			break;
 		default:
 			cerr<<"Unknown Instruction Format 3"<<endl;
