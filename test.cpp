@@ -20,15 +20,15 @@ vector<event*> getEventList(Decode* dec, string& source, string& dest, void* mag
 
 int printResult(string from_to, event* ev, string expected) {
 	string mexDecode = "DECODE send message to ";
-	string dest;
-	strcpy((char *)dest.c_str(), ev->m->dest);
-	cout << from_to << mexDecode << dest << endl;
-	delete ev->m;
-	delete ev;
-	if(strcmp((char *) expected.c_str(), (char *)dest.c_str())){
-			cout << "\t [ERR] Destination is " << dest << " instead of " << expected << endl; 
+	cout << from_to << mexDecode << ev->m->dest << endl;
+	if(strcmp((char *) expected.c_str(), ev->m->dest)){
+			cout << "\t [ERR] Destination is " << ev->m->dest << " instead of " << expected << endl; 
+			delete ev->m;
+			delete ev;
 			return 1;
 	}
+	delete ev->m;
+	delete ev;
 	return 0;
 }
 
