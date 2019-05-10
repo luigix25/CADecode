@@ -7,7 +7,7 @@
 #define OF 11
 
 #define EVENT_TIME 30	//in cosa si misurano?? 
-#define MEMORY "MEMORY"
+#define MEMORY "LowerLvl"
 #define ALU "ALU"
 #define FETCH "FETCH"
 #define DECODE "DECODE"

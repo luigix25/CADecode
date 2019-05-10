@@ -11,7 +11,7 @@ module::module(string name, int priority){//Default priority is 0. Higher the va
 	_currentTime = 0;
 }
 
-string module::getName(){return _name;};
+string module::getName(){return _name;}
 
 int module::getPriority(){return _priority;}
 
@@ -20,7 +20,7 @@ vector<event*> module::initialize(){
 	vector<event*> result = events;
 	events.clear();
 	return result;
-};
+}
 
 //This method is used by the system, should not be called directly
 vector<event*> module::notify(event* e){
@@ -29,7 +29,7 @@ vector<event*> module::notify(event* e){
 	vector<event*> result = events;
 	events.clear();
 	return result;
-};
+}
 
 //Returns the current simulated system time
 int module::getTime(){

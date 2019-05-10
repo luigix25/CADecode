@@ -1,6 +1,10 @@
 #include "decode.h"
 
 using namespace std;
+#define nameF3F4_length 15
+#define nameF2_length 	4
+#define nameJump_length 18
+
 
 fetch_registers regs;
 decode_registers alu_regs;
@@ -52,15 +56,15 @@ int main(){
 	string mexAD = "\t  ALU send messages to DECODE -> ";
 	string mexMD = "\t  MEMORY send messages to DECODE -> ";
 
-	int nameJump_length = 18;
+	//int nameJump_length = 18;
 	string nameJump[nameJump_length] = {	
 									"JE","JNE","JA","JAE","JB","JBE","JG","JGE","JL",
 									"JLE","JZ","JNZ","JC","JNC","JO","JNO","JS","JNS"
 									};
-	int nameF2_length = 4;
+	//int nameF2_length = 4;
 	string nameF2[nameF2_length] = {"INC", "DEC", "NEG", "NOT"};
 
-	int nameF3F4_length = 15;
+	//int nameF3F4_length = 15;
 	string nameF3F4[nameF3F4_length] = {
 					"ADD","SUB","CMP","MUL","IMUL","DIV","IDIV",
  					"AND","OR","SHL","SAL","SHR","SAR","LOAD","STORE"
