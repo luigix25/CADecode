@@ -12,11 +12,8 @@
 #define FETCH "FETCH"
 #define DECODE "DECODE"
 
-
 #include "module.h"
-#include "fetch_registers.h"
-#include "decode_registers.h"
-#include "memory_message.h"
+#include "main.h"
 
 #include <iostream>
 #include <cstring>
@@ -45,7 +42,7 @@ class Decode : public module{
 		message* handle_memory(message *);
 		message* handle_load(uint16_t);
 		
-		memory_message shared_dec_mem;		//nome temporaneo
+		memory_message shared_dec_mem;
 	public:
 		Decode(string, int);
 		void onNotify(message*);		

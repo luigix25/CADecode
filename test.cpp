@@ -1,4 +1,5 @@
 #include "decode.h"
+#include "main.h"
 
 using namespace std;
 #define nameF3F4_length 15
